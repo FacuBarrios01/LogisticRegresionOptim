@@ -8,7 +8,7 @@ ly = -10:0.5:10;
 
 options = optimoptions(@fminunc,'Display','off');
 [x,fval,exitflag,output] = fminunc(@ff_test, x0, options);
-fprintf('Optimun found for test function is [%.4f, %.4f]\n', x);
+fprintf('Optimun found for test function is [%.4f, %.4f]\n Number of objective calls = %d \n', x, output.funcCount);
 
 [Xg,Yg] = meshgrid(lx, ly);
 Z = zeros(length(lx), length(ly));
@@ -20,8 +20,6 @@ Z = zeros(length(lx), length(ly));
 for i=1:length(Xg)
     Z(:,i) = ff_test_vectorial([Xg(:,i),Yg(:,i)]);
 end
-% Both solutions perform similary, we could use the parallel toolbox to
-% reduce procesing time
 
 % tic
 % Z = zeros(length(lx), length(ly));
@@ -55,7 +53,7 @@ theta0 = zeros(3,1);
 
 options = optimset('Display', 'off', 'Algorithm', 'Quasi-Newton', 'GradObj', 'on');
 [theta,J,exitflag,output] = fminunc(@(e) ff_logistic_reg(e, X, Y), theta0, options);
-fprintf('Optimun found logistic regression: \n Theta = [%.4f; %.f4 ;%.4f] \n J = %.4f \n', theta, J);
+fprintf('Optimun found logistic regression: \n Theta = [%.4f; %.f4 ;%.4f] \n J = %.4f \n Number of objective calls = %d \n', theta, J, output.funcCount);
 
 y = predict(X, theta);
 numAsserts = sum(y == Y);
@@ -73,3 +71,8 @@ xlabel('First Grade');
 ylabel('Second Grade');
 title('Decision boundary');
 hold off;
+
+function y = ff_test_vectorial(x)
+    y = (x(:,1) + 2*x(:,2) - 7).^2 + (2*x(:,1) + x(:,2) - 5).^2;
+end
+
